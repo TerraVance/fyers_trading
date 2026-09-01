@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     environment: str = "development"
     
     # Fyers API config
-    fyers_client_id: str = "YOUR_CLIENT_ID"
+    fyers_app_id: str = "YOUR_APP_ID"
     fyers_secret_key: str = "YOUR_SECRET_KEY"
     fyers_redirect_uri: str = "http://localhost:8000/api/v1/broker/callback"
     
