@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+
+# Data and State
+data/cache/
+data/state/
+data/app.db
+
+# Environment Variables
+.env
+
+# Data Cache (Ignored to prevent committing massive parquet files)
+backend/data_cache/d/node_modules/
+frontend/dist/
+frontend/.env.local
+
+# OS
+.DS_Store

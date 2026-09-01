@@ -1,0 +1,15 @@
+items:
+  - symbol: "INFY"
+    exchange: "NSE"
+    token: "1594"
+    trading_symbol: "INFY-EQ"
+    sync_1m: true
+    sync_daily: true
+    live: true
+  - symbol: "TCS"
+    exchange: "NSE"
+    token: "11536"
+    trading_symbol: "TCS-EQ"
+    sync_1m: true
+    sync_daily: true
+    live: false
