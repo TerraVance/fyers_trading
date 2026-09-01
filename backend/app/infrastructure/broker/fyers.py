@@ -16,6 +16,24 @@ class FyersBroker(AbstractBroker):
             grant_type="authorization_code"
         )
         self.fyers = None
+        self.auth_code = None
+        self.token_file = os.path.join(os.path.dirname(__file__), "fyers_token.txt")
+        self._load_token_from_disk()
+
+    def _load_token_from_disk(self):
+        if os.path.exists(self.token_file):
+            try:
+                with open(self.token_file, "r") as f:
+                    token = f.read().strip()
+                if token:
+                    self.fyers = fyersModel.FyersModel(
+                        client_id=self.client_id,
+                        is_async=False,
+                        token=token,
+                        log_path=""
+                    )
+            except Exception as e:
+                print(f"Failed to load token from disk: {e}")
 
     def get_login_url(self) -> str:
         return self.session.generate_authcode()
@@ -28,6 +46,12 @@ class FyersBroker(AbstractBroker):
             else:
                 auth_code = redirected_url
 
+            # Store the auth_code in memory and to a file so it is globally accessible
+            self.auth_code = auth_code
+            auth_code_file = os.path.join(os.path.dirname(__file__), "fyers_auth_code.txt")
+            with open(auth_code_file, "w") as f:
+                f.write(auth_code)
+
             self.session.set_token(auth_code)
             response = self.session.generate_token()
             if "access_token" in response:
@@ -38,6 +62,11 @@ class FyersBroker(AbstractBroker):
                     token=access_token,
                     log_path=""
                 )
+                
+                # Persist to disk to survive reloads
+                with open(self.token_file, "w") as f:
+                    f.write(access_token)
+                    
                 return True
             return False
         except Exception as e:
