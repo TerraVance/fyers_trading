@@ -45,8 +45,10 @@ const BrokerPage = () => {
       const data = await res.json();
       
       if (res.ok && data.success) {
-        setStatus({ type: 'success', message: 'Successfully connected to Fyers API! Redirecting to Data Center...' });
-        setTimeout(() => navigate('/data'), 1500);
+        setStatus({ 
+          type: 'success', 
+          message: "Successfully connected to Fyers API! Your access token is valid until the end of the current trading day. You will need to re-authenticate before tomorrow's session." 
+        });
       } else {
         setStatus({ type: 'error', message: data.message || 'Authentication failed' });
       }
@@ -102,6 +104,13 @@ const BrokerPage = () => {
               {status.type === 'error' && <AlertTriangle size={14} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'text-bottom' }} />}
               {status.message}
             </span>
+            {status.type === 'success' && (
+              <div style={{ marginTop: '16px' }}>
+                <button className="btn-primary" onClick={() => navigate('/data')}>
+                  Proceed to Data Center
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>
