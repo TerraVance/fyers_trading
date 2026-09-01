@@ -17,6 +17,8 @@ class DownloadResponse(BaseModel):
     success: bool
     message: str
     rows_downloaded: int
+    actual_start_ms: int = 0
+    actual_end_ms: int = 0
 
 @router.post("/data/download", response_model=DownloadResponse)
 async def download_historical_data(req: DownloadRequest):
@@ -31,6 +33,29 @@ async def download_historical_data(req: DownloadRequest):
             req.start_ms, 
             req.end_ms
         )
-        return {"success": True, "message": f"Successfully cached data for {req.symbol}", "rows_downloaded": len(df)}
+        
+        actual_start = 0
+        actual_end = 0
+        if not df.empty and 'time' in df.columns:
+            actual_start = int(df['time'].iloc[0].timestamp() * 1000)
+            actual_end = int(df['time'].iloc[-1].timestamp() * 1000)
+
+        return {
+            "success": True, 
+            "message": f"Successfully cached data for {req.symbol}", 
+            "rows_downloaded": len(df),
+            "actual_start_ms": actual_start,
+            "actual_end_ms": actual_end
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+from backend.app.infrastructure.data.symbol_master import symbol_master
+
+@router.get("/data/symbols")
+async def search_symbols(query: str = ""):
+    try:
+        # First query might block while downloading CSVs, so wrap in to_thread
+        results = await asyncio.to_thread(symbol_master.search, query)
+        return {"success": True, "items": results}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
